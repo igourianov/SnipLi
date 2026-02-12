@@ -1,0 +1,43 @@
+.snipli-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 320px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: snipli-fade-in 0.2s ease forwards;
+}
+
+.snipli-toast--success {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.snipli-toast--error {
+  background: rgba(180, 30, 30, 0.9);
+}
+
+.snipli-toast--fade-out {
+  animation: snipli-fade-out 0.3s ease forwards;
+}
+
+@keyframes snipli-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes snipli-fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
