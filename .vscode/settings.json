@@ -1,0 +1,9 @@
+{
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"files.eol": "\n",
+	"explorer.autoRevealExclude": {
+		"**/node_modules": true,
+		"/jobs-archive": true
+	}
+}

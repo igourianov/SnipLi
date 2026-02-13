@@ -1,12 +1,14 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(dir:*)",
-      "WebSearch",
-      "Bash(npm install:*)",
-      "Bash(npm run build:*)",
-      "Bash(git mv:*)",
-      "WebFetch"
-    ]
-  }
+	"permissions": {
+		"allow": [
+			"Bash",
+			"WebFetch",
+			"WebSearch",
+			"Edit",
+			"Read",
+			"Write"
+		],
+		"deny": [],
+		"ask": []
+	}
 }
