@@ -1,11 +1,11 @@
 /**
  * @typedef {Object} JobData
- * @property {string} title
- * @property {string} company
- * @property {string} location
- * @property {string} salary
- * @property {string} description
+ * @property {string} jobTitle
+ * @property {string} companyName
+ * @property {string} jobDescription
+ * @property {string} companyDescription
  * @property {string} url
+ * @property {string[]} tags
  */
 
 /**
@@ -14,13 +14,23 @@
  * @returns {string}
  */
 export function formatMarkdown(jobData) {
-  return [
-    `# ${jobData.title} @ ${jobData.company}`,
-    `- **Location:** ${jobData.location}`,
-    `- **Salary:** ${jobData.salary}`,
-    `- **URL:** ${jobData.url}`,
-    "",
-    "## Description",
-    jobData.description,
-  ].join("\n");
+  const heading = `# ${jobData.jobTitle} @ ${jobData.companyName}`;
+
+  const lines = [heading];
+
+  if (jobData.tags.length > 0) {
+    lines.push(`- **Tags:** ${jobData.tags.join(" | ")}`);
+  }
+
+  lines.push(`- **URL:** ${jobData.url}`);
+
+  if (jobData.jobDescription) {
+    lines.push("", "## Job Description", jobData.jobDescription);
+  }
+
+  if (jobData.companyDescription) {
+    lines.push("", "## Company Description", jobData.companyDescription);
+  }
+
+  return lines.join("\n");
 }
