@@ -3,14 +3,15 @@
  * trimmed textContent of the first match.
  * @param {Element} root
  * @param {string} selector
- * @param {{ optional?: boolean, attr?: string }} [options]
+ * @param {{ optional?: boolean, prop?: string }} [options]
  * @returns {string | null}
  */
-export function query(root, selector, { optional = false, attr } = {}) {
+export function query(root, selector, { optional = false, prop } = {}) {
   const el = root.querySelector(selector);
   if (!el && !optional) {
     throw new Error(`Element not found: ${selector}`);
   }
-  const raw = attr ? el?.getAttribute(attr) : el?.textContent;
-  return raw?.trim() || null;
+  if (!el)
+	return null;
+  return el[prop || "innerText"]?.trim() || null;
 }

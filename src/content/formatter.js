@@ -14,23 +14,16 @@
  * @returns {string}
  */
 export function formatMarkdown(jobData) {
-  const heading = `# ${jobData.jobTitle} @ ${jobData.companyName}`;
+	const lines = [`# ${jobData.jobTitle}`];
+	lines.push(`- **Company:** ${jobData.companyName}`);
+	lines.push(`- **URL:** ${jobData.url}`);
 
-  const lines = [heading];
+	if (jobData.tags.length > 0) {
+		lines.push(`- **Tags:** ${jobData.tags.join(" | ")}`);
+	}
 
-  if (jobData.tags.length > 0) {
-    lines.push(`- **Tags:** ${jobData.tags.join(" | ")}`);
-  }
+	lines.push("", "## Job Description", jobData.jobDescription);
+	lines.push("", "## Company Description", jobData.companyDescription);
 
-  lines.push(`- **URL:** ${jobData.url}`);
-
-  if (jobData.jobDescription) {
-    lines.push("", "## Job Description", jobData.jobDescription);
-  }
-
-  if (jobData.companyDescription) {
-    lines.push("", "## Company Description", jobData.companyDescription);
-  }
-
-  return lines.join("\n");
+	return lines.join("\n");
 }

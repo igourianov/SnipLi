@@ -12,7 +12,7 @@ export function extractFromJobPage() {
 	const companyName = query(scope, ".job-details-jobs-unified-top-card__company-name");
 	const jobDescription = query(scope, "article.jobs-description__container");
 	const companyDescription = query(scope, ".jobs-company__company-description");
-	const tags = [...scope.querySelectorAll(".job-details-fit-level-preferences button")].map(el => el.textContent.trim());
+	const tags = [...scope.querySelectorAll(".job-details-fit-level-preferences button .tvm__text")].map(el => el.innerText?.trim());
 	const url = window.location.href.split("?")[0];
 
 	return { jobTitle, companyName, jobDescription, companyDescription, url, tags };
