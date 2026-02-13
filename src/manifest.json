@@ -3,7 +3,7 @@
   "name": "SnipLi",
   "version": "1.0.0",
   "description": "Copy structured job posting data from LinkedIn as markdown.",
-  "permissions": ["activeTab", "clipboardWrite", "webNavigation"],
+  "permissions": ["activeTab", "clipboardWrite", "tabs", "webNavigation"],
   "background": {
     "service_worker": "background.js"
   },
