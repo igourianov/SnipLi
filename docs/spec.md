@@ -51,7 +51,7 @@ snipli/
 
 - `src/background/` -- Service worker entry point. Runs in the extension's background context.
 - `src/content/` -- All code that runs in the LinkedIn page context. Webpack bundles this into a single content script.
-- `icons/` -- Extension icon assets in required sizes. To be provided later; the extension is loadable without them (Chrome shows a default).
+- `icons/` -- Extension icon assets in required sizes. SVG source files may be kept here for design purposes but only PNGs are copied to the build output. To be provided later; the extension is loadable without them (Chrome shows a default).
 - Root config files handle build tooling and extension declaration.
 
 ## System Components
@@ -231,7 +231,7 @@ snipli/
 - **Scripts:**
   - `npm run build` -- production build.
   - `npm run watch` -- development build with `--watch` flag.
-- **Static files:** `manifest.json` and `icons/` are manually placed in or copied to `dist/`. Use `copy-webpack-plugin` for `manifest.json` and `icons/` to keep the build self-contained.
+- **Static files:** Use `copy-webpack-plugin` to copy `manifest.json` and `icons/` to `dist/`, keeping the build self-contained. The icons copy pattern must use a glob that only includes `.png` files (e.g., `icons/**/*.png`), excluding any `.svg` source files that may be present in the `icons/` directory.
 - **No dev server, no hot reload.**
 
 ## Error Handling
