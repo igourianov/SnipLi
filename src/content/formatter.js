@@ -4,6 +4,7 @@
  * @property {string} companyName
  * @property {string} jobDescription
  * @property {string} companyDescription
+ * @property {string} location
  * @property {string} url
  * @property {string[]} tags
  */
@@ -16,6 +17,7 @@
 export function formatMarkdown(jobData) {
 	const lines = [`# ${jobData.jobTitle}`];
 	lines.push(`- **Company:** ${jobData.companyName}`);
+	lines.push(`- **Location:** ${jobData.location}`);
 	lines.push(`- **URL:** ${jobData.url}`);
 
 	if (jobData.tags.length > 0) {
