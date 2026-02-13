@@ -40,9 +40,19 @@ export function showToast(message, type) {
     currentTimeout = null;
   }
 
+  const icon = type === "success" ? "\u2714" : "\u2716";
+
   const toast = document.createElement("div");
   toast.className = `snipli-toast snipli-toast--${type}`;
-  toast.textContent = message;
+
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "snipli-toast__icon";
+  iconSpan.textContent = icon;
+
+  const msgSpan = document.createElement("span");
+  msgSpan.textContent = message;
+
+  toast.append(iconSpan, msgSpan);
   shadow.appendChild(toast);
 
   currentTimeout = setTimeout(() => {

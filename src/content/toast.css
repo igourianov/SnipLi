@@ -3,6 +3,8 @@
   top: 24px;
   right: 24px;
   z-index: 2147483647;
+  display: flex;
+  align-items: center;
   padding: 12px 20px;
   border-radius: 8px;
   color: #fff;
@@ -16,12 +18,25 @@
   animation: snipli-fade-in 0.2s ease forwards;
 }
 
+.snipli-toast__icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
 .snipli-toast--success {
   background: rgba(0, 0, 0, 0.8);
 }
 
+.snipli-toast--success .snipli-toast__icon {
+  color: #4caf50;
+}
+
 .snipli-toast--error {
   background: rgba(180, 30, 30, 0.9);
+}
+
+.snipli-toast--error .snipli-toast__icon {
+  color: #ff6b6b;
 }
 
 .snipli-toast--fade-out {
