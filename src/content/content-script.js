@@ -31,7 +31,7 @@ const PAGE_CONFIGS = [
 		match: /\/jobs\/search/,
 		scope: "main .jobs-search__job-details--wrapper",
 		getUrl: (scope) =>
-			query(scope, ".job-details-jobs-unified-top-card__job-title a", { prop: "href" })?.split("?")[0],
+			query(scope, ".job-details-jobs-unified-top-card__job-title a").href?.split("?")[0],
 	},
 	{
 		match: /\/jobs\/view\//,
@@ -47,23 +47,29 @@ function extractJobData() {
 	const scope = document.querySelector(config.scope);
 	if (!scope) throw new Error(`Job details container not found: ${config.scope}`);
 
-	const jobTitle = query(scope, ".job-details-jobs-unified-top-card__job-title");
-	const companyName = query(scope, ".job-details-jobs-unified-top-card__company-name");
-	const location = query(scope, ".job-details-jobs-unified-top-card__primary-description-container .tvm__text");
-	const jobDescription = query(scope, "article.jobs-description__container");
-	const companyDescription = query(scope, ".jobs-company__company-description");
-	const tags = [...scope.querySelectorAll(".job-details-fit-level-preferences button .tvm__text")].map(el => el.innerText?.trim());
+	const jobTitle = queryText(scope, ".job-details-jobs-unified-top-card__job-title");
+	const companyName = queryText(scope, ".job-details-jobs-unified-top-card__company-name");
+	const location = queryText(scope, ".job-details-jobs-unified-top-card__primary-description-container .tvm__text");
+	const jobDescription = queryText(scope, "article.jobs-description__container");
+	const companyDescription = queryText(scope, ".jobs-company__company-description");
+	const tags = [...scope.querySelectorAll(".job-details-fit-level-preferences button .tvm__text")]
+		.map(el => el.innerText?.trim())
+		.filter(x => !!x);
 	const url = config.getUrl(scope);
 
 	return { jobTitle, companyName, location, jobDescription, companyDescription, url, tags };
 }
 
-function query(root, selector, { prop } = {}) {
+function query(root, selector) {
 	const el = root.querySelector(selector);
 	if (!el) {
 		throw new Error(`Element not found: ${selector}`);
 	}
-	return el[prop || "innerText"]?.trim() || null;
+	return el;
+}
+
+function queryText(root, selector) {
+	return query(root, selector).innerText?.trim() || "";
 }
 
 function formatMarkdown(jobData) {
