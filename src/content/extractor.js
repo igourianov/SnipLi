@@ -19,10 +19,10 @@ const PAGE_CONFIGS = [
  */
 export function extractJobData() {
 	const config = PAGE_CONFIGS.find((c) => c.match.test(window.location.pathname));
-	if (!config) return null;
+	if (!config) throw new Error(`Unsupported page: ${window.location.pathname}`);
 
 	const scope = document.querySelector(config.scope);
-	if (!scope) return null;
+	if (!scope) throw new Error(`Job details container not found: ${config.scope}`);
 
 	const jobTitle = query(scope, ".job-details-jobs-unified-top-card__job-title");
 	const companyName = query(scope, ".job-details-jobs-unified-top-card__company-name");

@@ -12,11 +12,6 @@ async function handleExtract() {
 		return;
 	}
 
-	if (!jobData) {
-		showToast("No job posting found on this page", "error");
-		return;
-	}
-
 	const markdown = formatMarkdown(jobData);
 
 	try {
