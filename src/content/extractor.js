@@ -36,11 +36,10 @@ export function extractJobData() {
 }
 
 
-function query(root, selector, { optional = false, prop } = {}) {
+function query(root, selector, { prop } = {}) {
 	const el = root.querySelector(selector);
-	if (!el && !optional) {
+	if (!el) {
 		throw new Error(`Element not found: ${selector}`);
 	}
-	if (!el) return null;
 	return el[prop || "innerText"]?.trim() || null;
 }
