@@ -1,7 +1,9 @@
 main .artdeco-card.job-details-module.relative,
 main .upsell-premium-custom-section-card__container,
 main .job-details-how-you-match-card__container.artdeco-card.job-details-module,
-main .artdeco-card.full-width.job-details-module
+main .artdeco-card.full-width.job-details-module,
+main .artdeco-card.jobs-details__smp-promo.job-details-module,
+main .jobs-details__salary-main-rail-card
 {
 	/*remove premium garbage*/
 	display: none;
