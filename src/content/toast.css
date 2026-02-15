@@ -18,28 +18,28 @@
   animation: snipli-fade-in 0.2s ease forwards;
 }
 
-.snipli-toast__icon {
+.snipli-toast > .icon {
   margin-right: 8px;
   font-size: 16px;
 }
 
-.snipli-toast--success {
+.snipli-toast.success {
   background: rgba(0, 0, 0, 0.8);
 }
 
-.snipli-toast--success .snipli-toast__icon {
+.snipli-toast.success > .icon {
   color: #4caf50;
 }
 
-.snipli-toast--error {
+.snipli-toast.error {
   background: rgba(180, 30, 30, 0.9);
 }
 
-.snipli-toast--error .snipli-toast__icon {
+.snipli-toast.error > .icon {
   color: #ff6b6b;
 }
 
-.snipli-toast--fade-out {
+.snipli-toast.fade-out {
   animation: snipli-fade-out 0.3s ease forwards;
 }
 

@@ -43,10 +43,10 @@ export function showToast(message, type) {
   const icon = type === "success" ? "\u2714" : "\u2716";
 
   const toast = document.createElement("div");
-  toast.className = `snipli-toast snipli-toast--${type}`;
+  toast.className = `snipli-toast ${type}`;
 
   const iconSpan = document.createElement("span");
-  iconSpan.className = "snipli-toast__icon";
+  iconSpan.className = "icon";
   iconSpan.textContent = icon;
 
   const msgSpan = document.createElement("span");
@@ -56,7 +56,7 @@ export function showToast(message, type) {
   shadow.appendChild(toast);
 
   currentTimeout = setTimeout(() => {
-    toast.classList.add("snipli-toast--fade-out");
+    toast.classList.add("fade-out");
     setTimeout(() => toast.remove(), FADE_OUT_DURATION);
   }, DISPLAY_DURATION);
 }

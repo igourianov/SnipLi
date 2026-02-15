@@ -21,7 +21,8 @@ async function handleExtract() {
 	try {
 		await navigator.clipboard.writeText(markdown);
 		showToast("Copied to clipboard!", "success");
-	} catch {
+	} catch (err) {
+		console.error("[SnipLi] Failed to copy to clipboard:", err);
 		showToast("Failed to copy to clipboard", "error");
 	}
 }
