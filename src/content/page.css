@@ -1,0 +1,8 @@
+main .artdeco-card.job-details-module.relative,
+main .upsell-premium-custom-section-card__container,
+main .job-details-how-you-match-card__container.artdeco-card.job-details-module,
+main .artdeco-card.full-width.job-details-module
+{
+	/*remove premium garbage*/
+	display: none;
+}

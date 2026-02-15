@@ -11,6 +11,7 @@
     {
       "matches": ["*://www.linkedin.com/jobs/*"],
       "js": ["content.js"],
+      "css": ["content/page.css"],
       "run_at": "document_idle"
     }
   ],
