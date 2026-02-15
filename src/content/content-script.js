@@ -41,11 +41,11 @@ const PAGE_CONFIGS = [
 ];
 
 function extractJobData() {
-	const config = PAGE_CONFIGS.find((c) => c.match.test(window.location.pathname));
-	if (!config) throw new Error(`Unsupported page: ${window.location.pathname}`);
+	const config = PAGE_CONFIGS.find((c) => c.match.test(window.location.pathname))
+		?? fail(`Unsupported page: ${window.location.pathname}`);
 
-	const scope = document.querySelector(config.scope);
-	if (!scope) throw new Error(`Job details container not found: ${config.scope}`);
+	const scope = document.querySelector(config.scope)
+		?? fail(`Job details container not found: ${config.scope}`);
 
 	const jobTitle = queryText(scope, ".job-details-jobs-unified-top-card__job-title");
 	const companyName = queryText(scope, ".job-details-jobs-unified-top-card__company-name");
@@ -60,12 +60,12 @@ function extractJobData() {
 	return { jobTitle, companyName, location, jobDescription, companyDescription, url, tags };
 }
 
+function fail(msg) {
+	throw new Error(msg);
+}
+
 function query(root, selector) {
-	const el = root.querySelector(selector);
-	if (!el) {
-		throw new Error(`Element not found: ${selector}`);
-	}
-	return el;
+	return root.querySelector(selector) ?? fail(`Element not found: ${selector}`);
 }
 
 function queryText(root, selector) {
