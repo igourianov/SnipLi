@@ -1,0 +1,21 @@
+main > div:first-child > div:first-child > div:first-child > div:first-child > div:first-child > div:first-child > div:nth-child(2) > :is(
+	div:first-child,
+	div[componentkey^='JobDetails_JobAlertToggle'],
+	div[componentkey^='JobDetails_ResumeReview'],
+	div[componentkey^='JobDetails_PremiumApplicantInsights'],
+	div[componentkey^='JobDetails_PremiumCompanyInsights'],
+	div[componentkey^='JobDetailsSimilarJobsSlot']
+)
+{
+	/*remove premium garbage*/
+	display: none;
+}
+
+main [data-testid='expandable-text-box'] {
+	-webkit-line-clamp: none;
+	line-clamp: none;
+}
+
+main button[data-testid='expandable-text-button'] {
+	display: none;
+}

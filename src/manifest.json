@@ -11,8 +11,15 @@
     {
       "matches": ["*://www.linkedin.com/jobs/*"],
       "js": ["content.js"],
-      "css": ["content/page.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://www.linkedin.com/jobs/view/*"],
+      "css": ["content/view.css"]
+    },
+    {
+      "matches": ["*://www.linkedin.com/jobs/search/*"],
+      "css": ["content/search.css"]
     }
   ],
   "commands": {
