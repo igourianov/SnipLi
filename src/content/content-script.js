@@ -33,11 +33,27 @@ const PAGE_CONFIGS = [
 		scope: "main .jobs-search__job-details--wrapper",
 		getUrl: (scope) =>
 			query(scope, ".job-details-jobs-unified-top-card__job-title a").href?.split("?")[0],
+		selectors: {
+			jobTitle: ".job-details-jobs-unified-top-card__job-title",
+			companyName: ".job-details-jobs-unified-top-card__company-name",
+			location: ".job-details-jobs-unified-top-card__primary-description-container .tvm__text",
+			jobDescription: "article.jobs-description__container",
+			companyDescription: ".jobs-company__company-description",
+			tags: ".job-details-fit-level-preferences button .tvm__text",
+		},
 	},
 	{
 		match: /\/jobs\/view\//,
 		scope: "main .jobs-details",
 		getUrl: () => window.location.href.split("?")[0],
+		selectors: {
+			jobTitle: ".job-details-jobs-unified-top-card__job-title",
+			companyName: ".job-details-jobs-unified-top-card__company-name",
+			location: ".job-details-jobs-unified-top-card__primary-description-container .tvm__text",
+			jobDescription: "article.jobs-description__container",
+			companyDescription: ".jobs-company__company-description",
+			tags: ".job-details-fit-level-preferences button .tvm__text",
+		},
 	},
 ];
 
@@ -48,29 +64,23 @@ function extractJobData() {
 	const scope = document.querySelector(config.scope)
 		?? fail(`Job details container not found: ${config.scope}`);
 
-	const jobTitle = queryText(scope, ".job-details-jobs-unified-top-card__job-title");
-	const companyName = queryText(scope, ".job-details-jobs-unified-top-card__company-name");
-	const location = queryText(scope, ".job-details-jobs-unified-top-card__primary-description-container .tvm__text");
-	const jobDescription = queryText(scope, "article.jobs-description__container");
-	const companyDescription = queryText(scope, ".jobs-company__company-description");
-	const tags = [...scope.querySelectorAll(".job-details-fit-level-preferences button .tvm__text")]
-		.map(el => el.innerText?.trim())
-		.filter(x => !!x);
-	const url = config.getUrl(scope);
+	const query = (selector) => scope.querySelector(selector) ?? fail(`Element not found: ${selector}`);
+	const queryText = (selector) => query(selector).innerText?.trim() || "";
 
-	return { jobTitle, companyName, location, jobDescription, companyDescription, url, tags };
+	const { selectors: sel } = config;
+	return {
+		jobTitle: queryText(sel.jobTitle),
+		companyName: queryText(sel.companyName),
+		location: queryText(sel.location),
+		jobDescription: queryText(sel.jobDescription),
+		companyDescription: queryText(sel.companyDescription),
+		tags: [...scope.querySelectorAll(sel.tags)].map(el => el.innerText?.trim()).filter(x => !!x),
+		url: config.getUrl(scope),
+	};
 }
 
 function fail(msg) {
 	throw new Error(msg);
-}
-
-function query(root, selector) {
-	return root.querySelector(selector) ?? fail(`Element not found: ${selector}`);
-}
-
-function queryText(root, selector) {
-	return query(root, selector).innerText?.trim() || "";
 }
 
 function formatMarkdown(jobData) {
