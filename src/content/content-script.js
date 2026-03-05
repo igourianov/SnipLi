@@ -27,47 +27,25 @@ async function handleExtract() {
 	}
 }
 
-const PAGE_CONFIGS = [
-	{
-		match: /\/jobs\/search/,
-		scope: "main .jobs-search__job-details--wrapper",
-		getUrl: (scope) =>
-			query(scope, ".job-details-jobs-unified-top-card__job-title a").href?.split("?")[0],
-		selectors: {
-			jobTitle: ".job-details-jobs-unified-top-card__job-title",
-			companyName: ".job-details-jobs-unified-top-card__company-name",
-			location: ".job-details-jobs-unified-top-card__primary-description-container .tvm__text",
-			jobDescription: "article.jobs-description__container",
-			companyDescription: ".jobs-company__company-description",
-			tags: ".job-details-fit-level-preferences button .tvm__text",
-		},
+const PAGE_CONFIG = {
+	scope: "main .jobs-search__job-details--wrapper",
+	selectors: {
+		jobTitle: ".job-details-jobs-unified-top-card__job-title",
+		companyName: ".job-details-jobs-unified-top-card__company-name",
+		location: ".job-details-jobs-unified-top-card__primary-description-container .tvm__text",
+		jobDescription: "article.jobs-description__container",
+		companyDescription: ".jobs-company__company-description",
+		tags: ".job-details-fit-level-preferences button .tvm__text",
+		url: ".job-details-jobs-unified-top-card__job-title a",
 	},
-	{
-		match: /\/jobs\/view\//,
-		scope: "main .jobs-details",
-		getUrl: () => window.location.href.split("?")[0],
-		selectors: {
-			jobTitle: ".job-details-jobs-unified-top-card__job-title",
-			companyName: ".job-details-jobs-unified-top-card__company-name",
-			location: ".job-details-jobs-unified-top-card__primary-description-container .tvm__text",
-			jobDescription: "article.jobs-description__container",
-			companyDescription: ".jobs-company__company-description",
-			tags: ".job-details-fit-level-preferences button .tvm__text",
-		},
-	},
-];
+};
 
 function extractJobData() {
-	const config = PAGE_CONFIGS.find((c) => c.match.test(window.location.pathname))
-		?? fail(`Unsupported page: ${window.location.pathname}`);
-
-	const scope = document.querySelector(config.scope)
-		?? fail(`Job details container not found: ${config.scope}`);
-
+	const scope = document.querySelector(PAGE_CONFIG.scope) ?? fail(`Job details container not found: ${PAGE_CONFIG.scope}`);
 	const query = (selector) => scope.querySelector(selector) ?? fail(`Element not found: ${selector}`);
 	const queryText = (selector) => query(selector).innerText?.trim() || "";
 
-	const { selectors: sel } = config;
+	const { selectors: sel } = PAGE_CONFIG;
 	return {
 		jobTitle: queryText(sel.jobTitle),
 		companyName: queryText(sel.companyName),
@@ -75,7 +53,7 @@ function extractJobData() {
 		jobDescription: queryText(sel.jobDescription),
 		companyDescription: queryText(sel.companyDescription),
 		tags: [...scope.querySelectorAll(sel.tags)].map(el => el.innerText?.trim()).filter(x => !!x),
-		url: config.getUrl(scope),
+		url: query(sel.url).href?.split("?")[0],
 	};
 }
 
