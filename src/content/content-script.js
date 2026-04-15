@@ -54,7 +54,7 @@ function extractJobData() {
 		companyDescription: queryText(sel.companyDescription),
 		tags: [...scope.querySelectorAll(sel.tags)].map(el => el.innerText?.trim()).filter(x => !!x),
 		url: query(sel.url).href?.split("?")[0],
-		companyTags: [...query(sel.companyDescription).previousElementSibling.childNodes].map(x => (x.nodeValue || x.innerText).trim()).filter(x => !!x),
+		companyTags: [...query(sel.companyDescription).previousElementSibling.childNodes].map(x => (x.nodeValue || x.innerText || "").trim()).filter(x => !!x),
 	};
 }
 
