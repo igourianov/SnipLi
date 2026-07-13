@@ -1,4 +1,5 @@
 const JOB_URL_PATTERN = /^https:\/\/www\.linkedin\.com\/jobs\/(search|view)\//;
+const CONSOLE_PREFIX = "[SnipLi]";
 
 function isJobPage(url) {
 	return JOB_URL_PATTERN.test(url);
@@ -13,8 +14,11 @@ function updateIconState(tabId, url) {
 }
 
 function triggerExtraction(tabId) {
+	console.debug(CONSOLE_PREFIX, "extracting job from tab", tabId);
 	chrome.tabs.sendMessage(tabId, { action: "extract" })
-		.catch(() => {}); // Content script not loaded yet or tab not available -- ignore silently
+		.catch((err) => {
+			console.error(CONSOLE_PREFIX, `extracting job from tab ${tabId} failed`, err);
+		});
 }
 
 // Disable icon by default for all tabs
