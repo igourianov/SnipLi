@@ -1,5 +1,7 @@
 import { showToast } from "./toast.js";
 
+const CONSOLE_PREFIX = "[SnipLi]";
+
 chrome.runtime.onMessage.addListener((message) => {
 	if (message.action === "extract") {
 		handleExtract();
@@ -11,7 +13,7 @@ async function handleExtract() {
 	try {
 		jobData = extractJobData();
 	} catch (err) {
-		console.error("[SnipLi] Failed to parse job posting:", err);
+		console.error(CONSOLE_PREFIX, "Failed to parse job posting", err);
 		showToast("Something went wrong while reading the job posting", "error");
 		return;
 	}
@@ -22,7 +24,7 @@ async function handleExtract() {
 		await navigator.clipboard.writeText(markdown);
 		showToast("Copied to clipboard!", "success");
 	} catch (err) {
-		console.error("[SnipLi] Failed to copy to clipboard:", err);
+		console.error(CONSOLE_PREFIX, "Failed to copy to clipboard", err);
 		showToast("Failed to copy to clipboard", "error");
 	}
 }
