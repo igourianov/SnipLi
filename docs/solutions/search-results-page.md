@@ -9,6 +9,7 @@ The user wants:
 * Extraction on the old `/jobs/search/` page to keep working for now.
 * On both new-markup pages, the job description and the company description show in full by default, without the "…more" truncation.
 * On both new-markup pages, the "Your profile and resume are missing some required qualifications" block is hidden, along with the premium sections that `view.css` hides today.
+* On both new-markup pages, the "Interested in working with us in the future?" and "Company photos" blocks inside the About the company section are hidden.
 * The view page CSS overrides to use the same stable selectors as the search results page, in one shared file.
 
 ## Constraints and assumptions
@@ -16,7 +17,7 @@ The user wants:
 * Every class name in the new markup is a generated hash. Selectors never use class names.
 * The only stable anchors in the job details markup are:
 	* `id` and `componentkey` values shaped `JobDetails_{Section}_{jobId}`, `JobDetails{Section}Slot_{jobId}` and `JobMatchRef_{jobId}`, always matched by prefix since the job id varies, plus the fixed key `InitialStateHowYouFitSlot`.
-	* `data-testid` values `expandable-text-box` and `expandable-text-button`.
+	* `data-testid` values `expandable-text-box`, `expandable-text-button` and `carousel-container`.
 	* `aria-label` on the top card company element: `Company, {name}`.
 * The detail pane root is a `data-testid="lazy-column"` element with a random UUID `componentkey`. Neither extraction nor CSS uses it. `lazy-column` elements nest (on the search results page the detail pane sits inside another one), so a rule anchored on "a `lazy-column`'s child" can match an ancestor of the whole pane.
 * Structural steps (parent, sibling, "next `p` in document order") are used only relative to a stable anchor and kept to one or two steps. No deep `nth-child` chains from `main`.
@@ -104,6 +105,9 @@ Injected on `/jobs/search-results/*` and `/jobs/view/*`. All rules are scoped un
 Hidden (`display: none`):
 * The AI fit block, in either state. Its key (`[componentkey^="JobMatchRef_"]` or `[componentkey="InitialStateHowYouFitSlot"]`) sits several wrapper `div`s deep, and its heading sits outside the keyed element. The rule hides the child of the section list that contains either key (via `:has()`), so neither the heading nor an empty card frame is left behind.
 * Elements whose `componentkey` starts with `JobDetails_JobAlertToggle`, `JobDetails_ResumeReview`, `JobDetails_PremiumApplicantInsights`, `JobDetails_PremiumCompanyInsights` or `JobDetailsSimilarJobsSlot`. Each is a direct child of the section list, so the keyed element is the one hidden.
+* Inside `[id^="JobDetails_AboutTheCompany_"]`, two blocks whose only keys are random UUIDs, so each is anchored on a stable neighbor:
+	* "Interested in working with us in the future?": the next element sibling of the company content block. The content block is the `div` holding the company link, the company tags row and the description paragraph, identified as the `div` with a direct child `p` containing the `expandable-text-box`.
+	* "Company photos": the `div` that directly follows an `hr` and contains a `[data-testid="carousel-container"]`. The `hr` directly before it is hidden too, so the section doesn't show two separators in a row.
 
 Expanded:
 * `[data-testid="expandable-text-box"]` has no line clamp (`-webkit-line-clamp` and `line-clamp` set to `none`).
@@ -130,4 +134,5 @@ These two rules cover both the job description and the company description, sinc
 	* A job with no chips has the apply row as the metadata block's next sibling. Its "Apply" link is external, so `tags` comes out empty. An apply link into `/jobs/` (not seen in the samples) would show up as a tag.
 * **Optional company section over failing.** Jobs without a company section still copy. Cost: a copy taken before the section renders silently lacks the company description and tags.
 * **Extraction text depends on the CSS hiding "…more".** Reading `innerText` works cleanly only because `job-details.css` sets the button to `display: none`. Both are injected on the same URL matches, so they can't drift apart at runtime. The alternative, excluding the button in the extractor, duplicates what the CSS already does. Cost: removing the CSS rule would add "… more" to the copied text.
+* **Anchoring the company section's "Interested" block on the description box.** It has no key of its own. Cost: for a company without a description, the rule has no anchor and the block stays visible.
 * **Hiding the AI fit block by its keys over hiding the section list's first child.** The old `view.css` hid it by position. If a job has no AI fit block, a position rule would hide whatever section comes first instead.

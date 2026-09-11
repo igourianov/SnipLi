@@ -15,6 +15,20 @@ main :has(> [id^='JobDetails_AboutTheJob_']) > :is(
 	display: none;
 }
 
+/*
+The About the company blocks have only random UUID keys, so each is anchored on a stable neighbor.
+"Interested in working with us in the future?" follows the content block holding the description paragraph, so it stays visible for a company without a description.
+The hr before "Company photos" is hidden with it, so the section doesn't show two separators in a row.
+*/
+main [id^='JobDetails_AboutTheCompany_'] :is(
+	div:has(> p [data-testid='expandable-text-box']) + *,
+	hr:has(+ div [data-testid='carousel-container']),
+	hr + div:has([data-testid='carousel-container'])
+)
+{
+	display: none;
+}
+
 main [data-testid='expandable-text-box'] {
 	-webkit-line-clamp: none;
 	line-clamp: none;
