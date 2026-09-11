@@ -6,7 +6,8 @@ LinkedIn has replaced the job search list page `/jobs/search/` with a new page a
 
 The user wants:
 * Copy-as-markdown to work on `/jobs/search-results/` and on `/jobs/view/`, producing the same markdown as on the old page.
-* Extraction on the old `/jobs/search/` page to keep working for now.
+* Support for the old `/jobs/search/` page dropped, since LinkedIn no longer serves it.
+* `README.md` to describe the supported pages and files.
 * On both new-markup pages, the job description and the company description show in full by default, without the "…more" truncation.
 * On both new-markup pages, the "Your profile and resume are missing some required qualifications" block is hidden, along with the premium sections that `view.css` hides today.
 * On both new-markup pages, the "Interested in working with us in the future?" and "Company photos" blocks inside the About the company section are hidden.
@@ -37,45 +38,47 @@ The user wants:
 	* The rendered company section was seen on the view page only. It is assumed identical on the search results page, since the section key and components are the same.
 * Ruled out: hiding the "People you can reach out to" section (`JobDetailsPeopleWhoCanHelpSlot_*`) and the view page's `JobDetails_ManageJobBanner_*`. Not requested.
 * Ruled out: waiting for or triggering the company section to render. A missing section is not an error.
+* Ruled out: splitting `content-script.js` into modules. It was deliberately consolidated into one file.
+* Ruled out: injecting the page CSS from the content script. The manifest's declarative CSS applies before the page first renders, so hidden blocks never flash.
+* Ruled out: changes to `toast.js` and `toast.css`. They are not part of this solution.
 
 ## Scope
 
 Owned:
-* `src/content/content-script.js`: page dispatch, both extractors, the shared query helpers and `formatMarkdown`.
-* `src/content/job-details.css`: CSS overrides for the new markup, shared by `/jobs/search-results/` and `/jobs/view/`.
-* `src/content/view.css`: superseded. The view page's overrides come from `job-details.css` only.
-* `src/manifest.json`: content script and CSS injection entries.
+* `src/content/content-script.js`: `extractJobData`, its helpers and `formatMarkdown`.
+* `src/content/job-details.css`: CSS overrides for the new markup, shared by `/jobs/search-results/` and `/jobs/view/`. It is the only page CSS file.
+* `src/content/view.css` and `src/content/search.css`: retired. Page overrides come from `job-details.css` only.
+* `src/manifest.json`: the `content_scripts` entries.
 * `src/background/service-worker.js`: the job page URL pattern.
-* `webpack.config.js`: only as far as `job-details.css` reaches `dist/content/` and `view.css` no longer does.
+* `webpack.config.js`: the page CSS copy patterns.
+* `README.md`.
 
 Context only, unchanged:
-* The existing `/jobs/search/` extractor's selectors and `PAGE_CONFIG`, and `search.css`.
 * `handleExtract` and the `JobData` shape.
 * `toast.js`, `toast.css`.
-* `README.md` and `docs/spec.md`.
+* `docs/spec.md`.
 
 ## Solution
 
-### Page dispatch (`content-script.js`)
+### Content script (`content-script.js`)
 
-`extractJobData` selects the extractor by `window.location.pathname`:
-* A path starting with `/jobs/search-results/` or `/jobs/view/` goes to the job details extractor.
-* A path starting with `/jobs/search/` goes to the existing extractor, driven by `PAGE_CONFIG` as it is now.
-* Any other path fails with an "Unsupported page" error, which reaches the user as the existing error toast.
+The content script runs only on `/jobs/search-results/` and `/jobs/view/` (see Injection), so it has one extractor and no page check. `extractJobData` is the job details extractor below. It returns the `JobData` object that `handleExtract` and `formatMarkdown` consume: `jobTitle`, `companyName`, `location`, `jobDescription`, `companyDescription`, `tags`, `companyTags`, `url`.
 
-`/jobs/search/` does not match `/jobs/search-results/` because of the trailing slash, so the order of the checks does not matter.
+LinkedIn navigates with `pushState`, so the script stays alive after the user leaves a job page in the same tab. Extraction triggered there (only through the keyboard shortcut, since the icon is disabled) fails on the missing About the job section and shows the usual error toast.
 
-Both extractors return the same `JobData` object: `jobTitle`, `companyName`, `location`, `jobDescription`, `companyDescription`, `tags`, `companyTags`, `url`. `handleExtract` and `formatMarkdown` do not know which page they are on.
-
-The element lookup helpers (`query`, `queryText`) and `fail` are module-level functions that take the root element to search in. Both extractors use them. A required element that is missing fails with a message naming the selector or step, as it does now.
+Helpers, all module-level:
+* `query` and `queryText` take the root element to search in. A required element that is missing fails with a message naming the selector.
+* One text helper returns an element's trimmed `innerText`, or an empty string for a missing element. `queryText` and every text read in the extractor go through it.
+* `queryFollowingParagraph` resolves the `following::p[1]` step.
+* `fail` throws with a message naming the missing selector or step.
 
 ### Job details extractor (`content-script.js`)
 
-One function serves both `/jobs/search-results/` and `/jobs/view/` with no per-page branches.
+One function serves both pages with no per-page branches.
 
 Elements, in the order they are resolved:
 * **About the job section**: `[id^="JobDetails_AboutTheJob_"]` in the document. There is only one job details pane on the page. The rest of its `id` is the job id.
-* **Section list**: the About the job section's parent. It holds the AI fit block, the people, job, premium, company and similar jobs sections.
+* **Section list**: the About the job section's parent, which always exists. It holds the AI fit block, the people, job, premium, company and similar jobs sections.
 * **Top card**: the section list's previous element sibling.
 * **Company element**: `[aria-label^="Company, "]` in the top card.
 * **Title paragraph**: the first `p` after the company element in document order, not counting the company element's own descendants. XPath's `following::p[1]` axis has exactly these semantics.
@@ -84,19 +87,19 @@ Elements, in the order they are resolved:
 
 Fields:
 * `jobTitle`: the title paragraph's text. On the search results page the text is inside a link, on the view page it is direct text. The "Verified job" badge link in the same paragraph has no text.
-* `url`: `https://www.linkedin.com/jobs/view/{jobId}/`, the same format the old page yields.
+* `url`: `https://www.linkedin.com/jobs/view/{jobId}/`.
 * `companyName`: the company element's text.
-* `location`: the text of the metadata paragraph's first `span`, e.g. `Canada`, the same value the old page yields.
+* `location`: the text of the metadata paragraph's first `span`, e.g. `Canada`.
 * `tags`: the non-empty texts of the `a[href*="/jobs/"]` links in the chips row, e.g. `Remote`, `Full-time`.
 * `jobDescription`: the text of `[data-testid="expandable-text-box"]` inside the About the job section.
 * `companyDescription`: the text of `[data-testid="expandable-text-box"]` inside `[id^="JobDetails_AboutTheCompany_"]`. Empty string when the section or its box is absent.
 * `companyTags`: the description box's parent `p` has a previous sibling holding the row `Computer Games • 1001-5000 employees • 1,423 on LinkedIn`. `companyTags` is the texts of that row's child elements, dropping `•` separators and empty entries. Empty array when the description box is absent.
 
-Every element except the company section's is required. Texts are read with `innerText` and trimmed, like the existing extractor. `innerText` of an `expandable-text-box` leaves out the "…more" button only because `job-details.css` hides it (see Tradeoffs).
+Every element except the company section's is required. Texts are read through the text helper. `innerText` of an `expandable-text-box` leaves out the "…more" button only because `job-details.css` hides it (see Tradeoffs).
 
 ### Markdown (`formatMarkdown`)
 
-The output is the same as now, with two differences for empty data:
+The output is the title heading, the Company, Location, URL and Tags lines, and the Job Description and Company Description sections, with two rules for empty data:
 * The `Tags` line lists `tags` followed by `companyTags`, and is present when that combined list is non-empty.
 * The `## Company Description` section is present only when `companyDescription` is non-empty.
 
@@ -124,21 +127,22 @@ Expanded:
 
 These two rules cover both the job description and the company description, since both use the same component.
 
-### Injection (`manifest.json`)
+### Injection (`manifest.json`, `webpack.config.js`)
 
-* The `content.js` entry matches `*://www.linkedin.com/jobs/search/*`, `*://www.linkedin.com/jobs/search-results/*` and `*://www.linkedin.com/jobs/view/*`.
-* A CSS entry injects `content/job-details.css` on `*://www.linkedin.com/jobs/search-results/*` and `*://www.linkedin.com/jobs/view/*`.
-* The `search.css` entry stays as it is.
+`content_scripts` has one entry matching `*://www.linkedin.com/jobs/search-results/*` and `*://www.linkedin.com/jobs/view/*`. It injects `content.js` and `content/job-details.css`. The build copies `job-details.css` to `dist/content/` as the only page CSS file.
 
 ### Icon state (`service-worker.js`)
 
-`JOB_URL_PATTERN` matches `/jobs/search/`, `/jobs/search-results/` and `/jobs/view/`, the three pages with extraction.
+`JOB_URL_PATTERN` matches `/jobs/search-results/` and `/jobs/view/`, the same pages the content script runs on.
+
+### README (`README.md`)
+
+Describes extraction on `/jobs/search-results/` and `/jobs/view/`, the CSS overrides on those pages, the project structure with `job-details.css` as the only page CSS file, and the content script matches.
 
 ## Tradeoffs
 
-* **Separate extractor function over a selector config for the new markup.** The new markup needs steps a selector map can't express: parent and sibling steps from the About the job section, "next `p` in document order" for title and location, and the sibling step for company tags. The old page keeps its `PAGE_CONFIG` untouched, so dropping it later is a deletion of one function and one config. Cost: two extraction styles live side by side until then.
+* **An extractor function over a selector config.** The new markup needs steps a selector map can't express: parent and sibling steps from the About the job section, "next `p` in document order" for title and location, and the sibling step for company tags. Cost: selectors and structural steps are spread through the function rather than listed in one place.
 * **One extractor for both new-markup pages, anchored on what they share.** The top card is found through the section list rather than the pane, the title through the company element rather than a link, the URL through the section id rather than the title link and the chips through position rather than their link target. Cost: the rules depend on the two pages keeping the same top card arrangement. A layout change on one page breaks both.
-* **Module-level query helpers over per-extractor closures.** This avoids duplicating the helpers across the two extractors. Cost: the old extractor's calls change form, a mechanical edit to code that otherwise stays as is.
 * **Anchoring on stable attributes plus short structural steps.** It is the least fragile option available without class names. When a step breaks, the missing element fails loudly. Where a step can resolve to the wrong element instead of failing, the result is silent:
 	* A job with no chips has the apply row as the metadata block's next sibling. Its "Apply" link is external, so `tags` comes out empty. An apply link into `/jobs/` (not seen in the samples) would show up as a tag.
 * **Optional company section over failing.** Jobs without a company section still copy. Cost: a copy taken before the section renders silently lacks the company description and tags.

@@ -9,17 +9,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.linkedin.com/jobs/search/*", "*://www.linkedin.com/jobs/search-results/*", "*://www.linkedin.com/jobs/view/*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    },
-    {
       "matches": ["*://www.linkedin.com/jobs/search-results/*", "*://www.linkedin.com/jobs/view/*"],
-      "css": ["content/job-details.css"]
-    },
-    {
-      "matches": ["*://www.linkedin.com/jobs/search/*"],
-      "css": ["content/search.css"]
+      "js": ["content.js"],
+      "css": ["content/job-details.css"],
+      "run_at": "document_idle"
     }
   ],
   "commands": {
