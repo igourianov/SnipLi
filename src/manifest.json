@@ -15,7 +15,7 @@
     },
     {
       "matches": ["*://www.linkedin.com/jobs/view/*"],
-      "css": ["content/view.css"]
+      "css": ["content/job-details.css"]
     },
     {
       "matches": ["*://www.linkedin.com/jobs/search/*"],

@@ -1,0 +1,26 @@
+/*
+The section list is the parent of the About the job section.
+The AI fit block's key sits several wrappers deep with its heading outside the keyed element, so the whole section list child containing it is hidden.
+*/
+main :has(> [id^='JobDetails_AboutTheJob_']) > :is(
+	:has([componentkey^='JobMatchRef_'], [componentkey='InitialStateHowYouFitSlot']),
+	[componentkey^='JobDetails_JobAlertToggle'],
+	[componentkey^='JobDetails_ResumeReview'],
+	[componentkey^='JobDetails_PremiumApplicantInsights'],
+	[componentkey^='JobDetails_PremiumCompanyInsights'],
+	[componentkey^='JobDetailsSimilarJobsSlot']
+)
+{
+	/*remove premium garbage*/
+	display: none;
+}
+
+main [data-testid='expandable-text-box'] {
+	-webkit-line-clamp: none;
+	line-clamp: none;
+}
+
+/*extraction reads innerText of the text box, which would include the button text if it were shown*/
+main button[data-testid='expandable-text-button'] {
+	display: none;
+}

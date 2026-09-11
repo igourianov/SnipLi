@@ -44,20 +44,26 @@ const PAGE_CONFIG = {
 
 function extractJobData() {
 	const scope = document.querySelector(PAGE_CONFIG.scope) ?? fail(`Job details container not found: ${PAGE_CONFIG.scope}`);
-	const query = (selector) => scope.querySelector(selector) ?? fail(`Element not found: ${selector}`);
-	const queryText = (selector) => query(selector).innerText?.trim() || "";
 
 	const { selectors: sel } = PAGE_CONFIG;
 	return {
-		jobTitle: queryText(sel.jobTitle),
-		companyName: queryText(sel.companyName),
-		location: queryText(sel.location),
-		jobDescription: queryText(sel.jobDescription),
-		companyDescription: queryText(sel.companyDescription),
+		jobTitle: queryText(scope, sel.jobTitle),
+		companyName: queryText(scope, sel.companyName),
+		location: queryText(scope, sel.location),
+		jobDescription: queryText(scope, sel.jobDescription),
+		companyDescription: queryText(scope, sel.companyDescription),
 		tags: [...scope.querySelectorAll(sel.tags)].map(el => el.innerText?.trim()).filter(x => !!x),
-		url: query(sel.url).href?.split("?")[0],
-		companyTags: [...query(sel.companyDescription).previousElementSibling.childNodes].map(x => (x.nodeValue || x.innerText || "").trim()).filter(x => !!x),
+		url: query(scope, sel.url).href?.split("?")[0],
+		companyTags: [...query(scope, sel.companyDescription).previousElementSibling.childNodes].map(x => (x.nodeValue || x.innerText || "").trim()).filter(x => !!x),
 	};
+}
+
+function query(root, selector) {
+	return root.querySelector(selector) ?? fail(`Element not found: ${selector}`);
+}
+
+function queryText(root, selector) {
+	return query(root, selector).innerText?.trim() || "";
 }
 
 function fail(msg) {
