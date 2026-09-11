@@ -29,6 +29,28 @@ main [id^='JobDetails_AboutTheCompany_'] :is(
 	display: none;
 }
 
+/*
+The top card's rows are the header block, the chips row and the actions row (Apply, Save), in that order, in one flex column.
+The actions row is anchored on the Save button and found by its two preceding siblings, since "contains the Save button" also matches every ancestor of the top card.
+A job without chips has no row in third position, so it keeps LinkedIn's layout.
+*/
+main :has(> button[aria-label='Save the job']) {
+	display: none;
+}
+
+main :has(> * + * + * button[aria-label='Save the job']) {
+	flex-flow: row wrap;
+	align-items: center;
+}
+
+main :has(+ * + * button[aria-label='Save the job']) {
+	flex-basis: 100%;
+}
+
+main * + * + :has(button[aria-label='Save the job']) {
+	margin-left: auto;
+}
+
 main [data-testid='expandable-text-box'] {
 	-webkit-line-clamp: none;
 	line-clamp: none;
