@@ -9,12 +9,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.linkedin.com/jobs/search/*"],
+      "matches": ["*://www.linkedin.com/jobs/search/*", "*://www.linkedin.com/jobs/search-results/*", "*://www.linkedin.com/jobs/view/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     },
     {
-      "matches": ["*://www.linkedin.com/jobs/view/*"],
+      "matches": ["*://www.linkedin.com/jobs/search-results/*", "*://www.linkedin.com/jobs/view/*"],
       "css": ["content/job-details.css"]
     },
     {

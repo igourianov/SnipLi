@@ -1,4 +1,4 @@
-const JOB_URL_PATTERN = /^https:\/\/www\.linkedin\.com\/jobs\/(search|view)\//;
+const JOB_URL_PATTERN = /^https:\/\/www\.linkedin\.com\/jobs\/(search|search-results|view)\//;
 const CONSOLE_PREFIX = "[SnipLi]";
 
 function isJobPage(url) {

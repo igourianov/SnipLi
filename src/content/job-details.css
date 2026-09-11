@@ -20,7 +20,10 @@ main [data-testid='expandable-text-box'] {
 	line-clamp: none;
 }
 
-/*extraction reads innerText of the text box, which would include the button text if it were shown*/
+/*
+LinkedIn sets display: inline-block in the button's inline style, which only an !important rule overrides.
+Extraction reads innerText of the text box, which would include the button text if it were shown.
+*/
 main button[data-testid='expandable-text-button'] {
-	display: none;
+	display: none !important;
 }
