@@ -18,12 +18,13 @@ main :has(> [id^='JobDetails_AboutTheJob_']) > :is(
 /*
 The About the company blocks have only random UUID keys, so each is anchored on a stable neighbor.
 "Interested in working with us in the future?" follows the content block holding the description paragraph, so it stays visible for a company without a description.
-The hr before "Company photos" is hidden with it, so the section doesn't show two separators in a row.
+The hr after "Company photos" is hidden with it, so the section doesn't show two separators in a row.
+The hr before it would need :has(+ …), which Chrome doesn't reliably apply on the live page.
 */
 main [id^='JobDetails_AboutTheCompany_'] :is(
 	div:has(> p [data-testid='expandable-text-box']) + *,
-	hr:has(+ div [data-testid='carousel-container']),
-	hr + div:has([data-testid='carousel-container'])
+	hr + div:has([data-testid='carousel-container']),
+	hr + div:has([data-testid='carousel-container']) + hr
 )
 {
 	display: none;
@@ -33,6 +34,7 @@ main [id^='JobDetails_AboutTheCompany_'] :is(
 The top card's rows are the header block, the chips row and the actions row (Apply, Save), in that order, in one flex column.
 The actions row is anchored on the Save button and found by its two preceding siblings, since "contains the Save button" also matches every ancestor of the top card.
 A job without chips has no row in third position, so it keeps LinkedIn's layout.
+The header block is reached as the row container's first child, since Chrome doesn't reliably apply :has(+ …) on the live page.
 */
 main :has(> button[aria-label='Save the job']) {
 	display: none;
@@ -43,7 +45,7 @@ main :has(> * + * + * button[aria-label='Save the job']) {
 	align-items: center;
 }
 
-main :has(+ * + * button[aria-label='Save the job']) {
+main :has(> * + * + * button[aria-label='Save the job']) > :first-child {
 	flex-basis: 100%;
 }
 

@@ -24,6 +24,7 @@ The user wants:
 	* `aria-label` on the top card Save button: `Save the job`. It is English UI text, and the label of an already saved job has not been seen.
 * The detail pane root is a `data-testid="lazy-column"` element with a random UUID `componentkey`. Neither extraction nor CSS uses it. `lazy-column` elements nest (on the search results page the detail pane sits inside another one), so a rule anchored on "a `lazy-column`'s child" can match an ancestor of the whole pane.
 * Structural steps (parent, sibling, "next `p` in document order") are used only relative to a stable anchor and kept to one or two steps. No deep `nth-child` chains from `main`.
+* No CSS rule uses a `:has()` whose argument starts with a sibling combinator (`:has(+ …)` or `:has(~ …)`). Chrome does not reliably apply that shape on the live page, where LinkedIn keeps changing the DOM after load. It applies in a static render, yet on some live job pages it does not, and `querySelectorAll` never returns its matches. `:has()` with child or descendant arguments is reliable.
 * The two pages differ in ways the solution absorbs without per-page logic:
 	* On the view page the pane's first child is `JobDetails_ManageJobBanner_*`, so the top card is not the pane's first child. On both pages it is the section list's previous sibling.
 	* The title is a link to `/jobs/view/{jobId}/` on the search results page and plain text on the view page.
@@ -112,11 +113,11 @@ Hidden (`display: none`):
 * Elements whose `componentkey` starts with `JobDetails_JobAlertToggle`, `JobDetails_ResumeReview`, `JobDetails_PremiumApplicantInsights`, `JobDetails_PremiumCompanyInsights` or `JobDetailsSimilarJobsSlot`. Each is a direct child of the section list, so the keyed element is the one hidden.
 * Inside `[id^="JobDetails_AboutTheCompany_"]`, two blocks whose only keys are random UUIDs, so each is anchored on a stable neighbor:
 	* "Interested in working with us in the future?": the next element sibling of the company content block. The content block is the `div` holding the company link, the company tags row and the description paragraph, identified as the `div` with a direct child `p` containing the `expandable-text-box`.
-	* "Company photos": the `div` that directly follows an `hr` and contains a `[data-testid="carousel-container"]`. The `hr` directly before it is hidden too, so the section doesn't show two separators in a row.
+	* "Company photos": the `div` that directly follows an `hr` and contains a `[data-testid="carousel-container"]`. The `hr` directly after it is hidden too, so the section doesn't show two separators in a row.
 
 Top card layout:
 * The top card's content is three sibling rows in one row container, in this order on both pages: the header block (company, title, metadata, "Promoted by hirer"), the chips row and the actions row (Apply, Save).
-* The actions row is the row containing `button[aria-label="Save the job"]`. The chips row is its previous sibling and the row container is their parent. They are identified by sibling position relative to the actions row, since a rule anchored on "contains the company element" also matches every ancestor of the top card.
+* The actions row is the row with two preceding siblings that contains `button[aria-label="Save the job"]`. The row container is its parent, i.e. the element with such a child (via `:has(> …)`). The header block is the row container's first child. Rows are identified by position relative to the actions row, since a rule anchored on "contains the company element" also matches every ancestor of the top card.
 * The Save button's immediate wrapper is hidden, so no empty slot or gap is left next to Apply.
 * The header block takes a full line. The chips row and the actions row share the next line, vertically centered with each other. The chips start at the left edge and the actions are aligned to the right edge, with free space between them. When the line has no room, the actions wrap below the chips.
 * A job without chips has only the header block and the actions row, and keeps LinkedIn's own layout.
