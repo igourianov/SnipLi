@@ -30,6 +30,11 @@ main [id^='JobDetails_AboutTheCompany_'] :is(
 	display: none;
 }
 
+/*The heading has no key of its own. It is the only h2 in the section.*/
+main [componentkey^='JobDetailsPeopleWhoCanHelpSlot_'] h2 {
+	display: none;
+}
+
 /*
 The top card's rows are the header block, the chips row and the actions row (Apply, Save), in that order, in one flex column.
 The actions row is anchored on the Save button and found by its two preceding siblings, since "contains the Save button" also matches every ancestor of the top card.

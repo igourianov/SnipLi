@@ -11,6 +11,7 @@ The user wants:
 * On both new-markup pages, the job description and the company description show in full by default, without the "…more" truncation.
 * On both new-markup pages, the "Your profile and resume are missing some required qualifications" block is hidden, along with the premium sections that `view.css` hides today.
 * On both new-markup pages, the "Interested in working with us in the future?" and "Company photos" blocks inside the About the company section are hidden.
+* On both new-markup pages, the "People you can reach out to" heading is hidden. The section itself stays visible.
 * On both new-markup pages, the top card's Save button is hidden, and the Apply button sits on the same line as the job type chips (Remote, Full-time, etc.), aligned to the right edge, instead of below them.
 * The view page CSS overrides to use the same stable selectors as the search results page, in one shared file.
 
@@ -37,7 +38,7 @@ The user wants:
 	* `Director of Accounting _ Embrace Software Inc _ LinkedIn.html`: search results page, AI fit block assessed, company section not rendered.
 	* `Tech Lead – Frontend Platform Team _ Xsolla _ LinkedIn.html`: view page, AI fit block not assessed, company section rendered.
 	* The rendered company section was seen on the view page only. It is assumed identical on the search results page, since the section key and components are the same.
-* Ruled out: hiding the "People you can reach out to" section (`JobDetailsPeopleWhoCanHelpSlot_*`) and the view page's `JobDetails_ManageJobBanner_*`. Not requested.
+* Ruled out: hiding the whole "People you can reach out to" section (`JobDetailsPeopleWhoCanHelpSlot_*`), beyond its heading, and the view page's `JobDetails_ManageJobBanner_*`. Not requested.
 * Ruled out: waiting for or triggering the company section to render. A missing section is not an error.
 * Ruled out: splitting `content-script.js` into modules. It was deliberately consolidated into one file.
 * Ruled out: injecting the page CSS from the content script. The manifest's declarative CSS applies before the page first renders, so hidden blocks never flash.
@@ -114,6 +115,7 @@ Hidden (`display: none`):
 * Inside `[id^="JobDetails_AboutTheCompany_"]`, two blocks whose only keys are random UUIDs, so each is anchored on a stable neighbor:
 	* "Interested in working with us in the future?": the next element sibling of the company content block. The content block is the `div` holding the company link, the company tags row and the description paragraph, identified as the `div` with a direct child `p` containing the `expandable-text-box`.
 	* "Company photos": the `div` that directly follows an `hr` and contains a `[data-testid="carousel-container"]`. The `hr` directly after it is hidden too, so the section doesn't show two separators in a row.
+* The "People you can reach out to" heading: the `h2` inside `[componentkey^="JobDetailsPeopleWhoCanHelpSlot_"]`, the section's only heading. The section and its content ("Meet the hiring team" and the people cards) stay visible.
 
 Top card layout:
 * The top card's content is three sibling rows in one row container, in this order on both pages: the header block (company, title, metadata, "Promoted by hirer"), the chips row and the actions row (Apply, Save).
