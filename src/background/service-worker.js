@@ -13,37 +13,36 @@ function updateIconState(tabId, url) {
 	}
 }
 
-function triggerExtraction(tabId) {
-	console.debug(CONSOLE_PREFIX, "extracting job from tab", tabId);
-	chrome.tabs.sendMessage(tabId, { action: "extract" })
+// The content script runs on every LinkedIn page, and the shortcut fires even where the icon is disabled.
+function triggerExtraction(tab) {
+	if (!isJobPage(tab.url)) {
+		return;
+	}
+	console.debug(CONSOLE_PREFIX, "extracting job from tab", tab.id);
+	chrome.tabs.sendMessage(tab.id, { action: "extract" })
 		.catch((err) => {
-			console.error(CONSOLE_PREFIX, `extracting job from tab ${tabId} failed`, err);
+			console.error(CONSOLE_PREFIX, `extracting job from tab ${tab.id} failed`, err);
 		});
 }
 
-// Disable icon by default for all tabs
 chrome.action.disable();
 
-// Icon click -- trigger extraction
-chrome.action.onClicked.addListener((tab) => {
-	triggerExtraction(tab.id);
-});
+chrome.action.onClicked.addListener(triggerExtraction);
 
-// Keyboard shortcut
 chrome.commands.onCommand.addListener((command, tab) => {
 	if (command === "copy-job") {
-		triggerExtraction(tab.id);
+		triggerExtraction(tab);
 	}
 });
 
-// Tab URL updates (full page loads)
+// Full page loads.
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	if (changeInfo.status === "complete" && tab.url) {
 		updateIconState(tabId, tab.url);
 	}
 });
 
-// SPA navigation (LinkedIn uses pushState)
+// LinkedIn navigates between views with pushState, without a page load.
 chrome.webNavigation.onHistoryStateUpdated.addListener(
 	(details) => {
 		if (details.frameId === 0) {
